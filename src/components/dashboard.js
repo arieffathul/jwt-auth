@@ -12,12 +12,17 @@ function Dashboard() {
 
   const fetchData = async () => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-    await axios.get('http://localhost:8000/api/user')
-      .then((response) => {
-        setUser(response.data);
-      });
+    try {
+      const response = await axios.get('http://localhost:8000/api/user');
+      setUser(response.data);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem("token");
+        navigate('/'); // Redirect to login if unauthorized
+      }
+    }
   };
+
 
   useEffect(() => {
     if (!token) {
